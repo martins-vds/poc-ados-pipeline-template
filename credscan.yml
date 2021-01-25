@@ -1,0 +1,35 @@
+# template to insert a step before and after user steps in every job
+variables:
+- name: skipCredScanPolicy
+  value: true
+  readonly: true
+
+parameters:
+- name: 'jobs'
+  type: jobList
+  default: []
+
+jobs:
+- job: CredScan
+  pool:
+    vmImage: 'windows-latest'                # Run your special tool in its own job first
+  displayName: 'CredScan (Injected by Template)'
+  steps:
+  - task: CredScan@2
+    inputs:
+      toolMajorVersion: 'V2'
+      outputFormat: 'sarif'
+  - task: PublishSecurityAnalysisLogs@2
+    inputs:
+      ArtifactName: 'CodeAnalysisLogs'
+      ArtifactType: 'Container'
+      AllTools: true
+      ToolLogsNotFoundAction: 'Standard'
+- ${{ each job in parameters.jobs }}: # Then do each job
+  - ${{ each pair in job }}:          # Insert all properties other than "dependsOn"
+      ${{ if ne(pair.key, 'dependsOn') }}:
+        ${{ pair.key }}: ${{ pair.value }}
+    dependsOn:                        # Inject dependency
+    - CredScan
+    - ${{ if job.dependsOn }}:
+      - ${{ job.dependsOn }}

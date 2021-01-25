@@ -1,1 +1,1 @@
-# poc-template
+# Proof-of-Concept: Azure DevOps Pipeline Template

@@ -1,0 +1,15 @@
+trigger: none
+name: PipelineWithTemplate
+
+extends:
+  template: credscan.yml
+  parameters:
+    jobs:
+      - job: runInlineScript
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+        - script: echo 1
+        - task: CmdLine@2
+          inputs:
+            script: 'echo Write your commands here'
