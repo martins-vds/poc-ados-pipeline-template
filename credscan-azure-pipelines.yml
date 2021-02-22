@@ -1,13 +1,21 @@
 trigger: none
-name: PipelineWithTemplate
+name: 'CredScan Pipeline'
+
+resources:
+  repositories:
+    - repository: templates
+      name: My Work/poc-shared-pipeline-templates
+      type: git
+      ref: refs/heads/main
 
 extends:
-  template: credscan.yml
+  template: security/credscan.yml@templates
   parameters:
     jobs:
       - job: runInlineScript
         pool:
           vmImage: 'windows-latest'
+        enviroment: 'Web Prod'
         steps:
         - script: echo 1
         - task: CmdLine@2

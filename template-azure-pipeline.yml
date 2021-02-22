@@ -1,0 +1,23 @@
+trigger: none
+name: 'Template Consumer Pipeline'
+
+resources:
+  repositories:
+    - repository: templates
+      name: My Work/poc-shared-pipeline-templates
+      type: git
+      ref: refs/heads/main
+
+variables:
+- template: variables/build.yml@templates
+
+stages:
+  - stage: Build
+    jobs:     
+      - job: build_website
+        steps:
+          - template: build/asp-net-core.yml@templates
+            parameters:
+              configuration: $(buildConfiguration)
+      - template: jobs-template.yml@templates
+  - template: stages-template.yml@templates
